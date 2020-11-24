@@ -94,48 +94,14 @@ def negatives():
         cv2.imwrite(negative_labels_output_dir + file_name + '.png', label)
         cv2.waitKey(1)
 
-def Sobel():
-    # fh = open(r"C:\Users\Urtis\PycharmProjects\Darbai_su_vaizdu\corsera\{}".format(fname1))
-    fname1 = input("Enter file name, where to take pictures from: ")
-    path_to_photos = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname1)
-    if not os.path.exists(path_to_photos):
-        print('Directory doesn\'t exist,')
-        return print("uzluzimas")
-
-
-    fname2 = input("Enter file name, where to put pictures with Sobel filter to: ")
-    positive_sobel_output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname2)
-    CreateDirectory(positive_sobel_output_dir)
-    try:
-        image_paths = GatherImagesFromDirectory(path_to_photos)
-    except:
-        print("pukst")
-
-
-    label1 = "Y"
-    label2 = "X"
-    for image_path in image_paths:
-        file_name = GetFileName(image_path)
-
-        image = cv2.imread(image_path)
-
-        image_Y = cv2.Sobel(image, cv2.CV_8UC1, 0, 1)
-        cv2.imshow("Sobel image", image_Y)
-        cv2.imwrite(positive_sobel_output_dir + file_name + '.png', label1)
-        cv2.waitKey(10)
-
-        image_X = cv2.Sobel(image, cv2.CV_8UC1, 1, 0)
-        cv2.imshow("Sobel image", image_X)
-        cv2.imwrite(negative_labels_output_dir + file_name + '.png', label2)
-        cv2.waitKey(10)
 
 
 def main():
 
-    #positives()
+    positives()
 
-    #negatives()
-    Sobel()
+    negatives()
+
 # what we will start? (entry point)
 if __name__ == "__main__":
     main()
