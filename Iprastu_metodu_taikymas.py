@@ -3,6 +3,7 @@ import glob
 import cv2
 import numpy as np
 import math
+from matplotlib import pyplot as plt
 
 def Uzklausa_is_kur_imti_foto():
     fname = input("Enter file name, where to take pictures from: ")                       # nurodomas inputas
@@ -62,7 +63,7 @@ def Sobel_X(path_to_photos):
         cv2.destroyWindow("Sobel_X image")
 
 def Sobel_Y(path_to_photos):
-    fname = input("Enter file name, where to put pictures with Sobel_Y filter to: ")               # nurodomas kitas inputas
+    fname = input("Enter file name, where to put pictures with Sobel_Y filter to: ")               # nurodomas inputas
     if fname == "skip":
         return print("SKIPINAM")
     positive_sobel_output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname) +'//'  # direktorija ikeliama i kintamaji
@@ -77,6 +78,23 @@ def Sobel_Y(path_to_photos):
         cv2.imwrite(positive_sobel_output_dir + file_name + '.png', image_Y)  # irasoma foto su pritaikytu Sobelio filtru i nurodyta direktorija, tuo paciu pavadinimu
         cv2.waitKey(10)                                                       # pauze
         cv2.destroyWindow("Sobel_Y image")                                    # uzdaroma foto, kad neuzterstu viewerio
+
+def binary_threshold(path_to_photos):
+    fname = input("Enter file name, where to put pictures with binary threshold filter to: ")
+    if fname == "skip":
+        return print("SKIPINAM")
+    output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname) + '//'
+    CreateDirectory(output_dir)
+    image_paths = GatherImagesFromDirectory(path_to_photos)
+
+    for image_path in image_paths:
+        file_name = GetFileName(image_path)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        ret,image_threshold = cv2.threshold(image, 75, 255, cv2.THRESH_BINARY)
+        cv2.imshow("binary threshold image", image_threshold)
+        cv2.imwrite(output_dir + file_name + '.png', image_threshold)
+        cv2.destroyWindow("binary threshold image")
+        cv2.waitKey(10)
 
 def binary_inverted_threshold(path_to_photos):
     fname = input("Enter file name, where to put pictures with binary inverted threshold filter to: ")
@@ -95,8 +113,8 @@ def binary_inverted_threshold(path_to_photos):
         cv2.destroyWindow("binary inverted threshold image")
         cv2.waitKey(10)
 
-def binary_threshold(path_to_photos):
-    fname = input("Enter file name, where to put pictures with binary threshold filter to: ")
+def OTSU_threshold(path_to_photos):
+    fname = input("Enter file name, where to put pictures with OTSU_threshold filter to: ")
     if fname == "skip":
         return print("SKIPINAM")
     output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname) + '//'
@@ -106,10 +124,30 @@ def binary_threshold(path_to_photos):
     for image_path in image_paths:
         file_name = GetFileName(image_path)
         image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-        ret,image_threshold = cv2.threshold(image, 75, 255, cv2.THRESH_BINARY)
-        cv2.imshow("binary threshold image", image_threshold)
+        # Otsu's thresholding
+        ret2, image_threshold = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        cv2.imshow("binary inverted threshold image", image_threshold)
         cv2.imwrite(output_dir + file_name + '.png', image_threshold)
-        cv2.destroyWindow("binary threshold image")
+        cv2.destroyWindow("binary inverted threshold image")
+        cv2.waitKey(10)
+
+def OTSU_threshold_with_Gaussian_blur(path_to_photos):
+    fname = input("Enter file name, where to put pictures with OTSU_threshold_with_Gaussian_blur filter to: ")
+    if fname == "skip":
+        return print("SKIPINAM")
+    output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname) + '//'
+    CreateDirectory(output_dir)
+    image_paths = GatherImagesFromDirectory(path_to_photos)
+
+    for image_path in image_paths:
+        file_name = GetFileName(image_path)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        # Otsu's thresholding after Gaussian filtering
+        blur = cv2.GaussianBlur(image, (5, 5), 0)
+        ret3, image_threshold = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        cv2.imshow("binary inverted threshold image", image_threshold)
+        cv2.imwrite(output_dir + file_name + '.png', image_threshold)
+        cv2.destroyWindow("binary inverted threshold image")
         cv2.waitKey(10)
 
 def Laplacian(path_to_photos):
@@ -129,13 +167,60 @@ def Laplacian(path_to_photos):
         cv2.destroyWindow("Laplacian image")
         cv2.waitKey(10)
 
+def Find_contours(path_to_photos):
+    fname = input("Enter file name, where to put pictures with Find_contours filter to: ")
+    if fname == "skip":
+        return print("SKIPINAM")
+    output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname) + '//'
+    CreateDirectory(output_dir)
+    image_paths = GatherImagesFromDirectory(path_to_photos)
+
+    for image_path in image_paths:
+        file_name = GetFileName(image_path)
+        image_gray = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        # Otsu's thresholding after Gaussian filtering
+        ret,image_threshold = cv2.threshold(image_gray, 75, 255, cv2.THRESH_BINARY_INV)
+        contours, hierarchy = cv2.findContours(image_threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # create an empty image for contours
+        img_contours = np.zeros(image_gray.shape)
+        # draw the contours on the empty image
+        cv2.drawContours(img_contours, contours, -1, (0,255,0), 3)
+        # save image
+        cv2.imshow("Find_contours", img_contours)
+        cv2.imwrite(output_dir + file_name + '.png', img_contours)
+        cv2.destroyWindow("Find_contours")
+        cv2.waitKey(10)
+
+def Canny_edge_detection_blur(path_to_photos):
+    fname = input("Enter file name, where to put pictures with Canny_edge_detection_blur filter to: ")
+    if fname == "skip":
+        return print("SKIPINAM")
+    output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\{}".format(fname) + '//'
+    CreateDirectory(output_dir)
+    image_paths = GatherImagesFromDirectory(path_to_photos)
+
+    for image_path in image_paths:
+        file_name = GetFileName(image_path)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        # Otsu's thresholding after Gaussian filtering
+        blur = cv2.GaussianBlur(image, (5, 5), 0)
+        imgCanny = cv2.Canny(blur,50,50)
+        cv2.imshow("binary inverted threshold image", imgCanny)
+        cv2.imwrite(output_dir + file_name + '.png', imgCanny)
+        cv2.destroyWindow("binary inverted threshold image")
+        cv2.waitKey(10)
+
 def main():
     path = Uzklausa_is_kur_imti_foto()
-    Sobel_X(path)
-    Sobel_Y(path)
-    binary_threshold(path)
-    binary_inverted_threshold(path)
-    Laplacian(path)
+    #Sobel_X(path)
+    #Sobel_Y(path)
+    #binary_threshold(path)
+    #binary_inverted_threshold(path)
+    #OTSU_threshold(path)
+    #OTSU_threshold_with_Gaussian_blur(path)
+    #Laplacian(path)
+    #Find_contours(path)
+    Canny_edge_detection_blur(path)
 # what we will start? (entry point)
 if __name__ == "__main__":
     main()
