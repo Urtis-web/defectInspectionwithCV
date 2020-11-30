@@ -94,13 +94,69 @@ def negatives():
         cv2.imwrite(negative_labels_output_dir + file_name + '.png', label)
         cv2.waitKey(1)
 
+def Rototion_and_fliping():
+    path_to_photo = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\bandymai/"
+    output_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\pasuktos_nuotraukos/"
+    CreateDirectory(output_dir)
+    # collect all image from directory
+    image_paths = GatherImagesFromDirectory(path_to_photo)
+    file_name = 0
+    for image_path in image_paths:
 
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', image)
+
+        new_img1 = cv2.rotate(image,rotateCode=0)   # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_img1)
+
+        new_img2 = cv2.rotate(image, rotateCode=1)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_img2)
+
+        new_img3 = cv2.rotate(image, rotateCode=2)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_img3)
+
+        new_fliped_img4= cv2.flip(image,1)
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_fliped_img4)
+
+        new_img5 = cv2.rotate(new_fliped_img4, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_img5)
+
+        new_img6 = cv2.rotate(new_fliped_img4, rotateCode=1)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_img6)
+
+        new_img7 = cv2.rotate(new_fliped_img4, rotateCode=2)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+        file_name = int(file_name) + 1
+        cv2.imwrite(output_dir + str(file_name) + '.png', new_img7)
+
+        cv2.imshow('image1', image)
+        cv2.waitKey(0)
+        cv2.imshow('image1', new_img1)
+        cv2.waitKey(0)
+        cv2.imshow('image2', new_img2)
+        cv2.waitKey(0)
+        cv2.imshow('image3', new_img3)
+        cv2.waitKey(0)
+        cv2.imshow('image4', new_fliped_img4)
+        cv2.waitKey(0)
+        cv2.imshow('image5', new_img5)
+        cv2.waitKey(0)
+        cv2.imshow('image6', new_img6)
+        cv2.waitKey(0)
+        cv2.imshow('image7', new_img7)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 def main():
+    Rototion_and_fliping()
 
-    positives()
 
-    negatives()
 
 # what we will start? (entry point)
 if __name__ == "__main__":
