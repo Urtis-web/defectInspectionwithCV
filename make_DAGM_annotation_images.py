@@ -75,9 +75,6 @@ def Check_what_kind_of_label(labels_txt_path, image_name):
                 return nedefektuotas
 
 
-
-
-
 def Getting_right_file(path, image_name):
     image_paths = GatherImagesFromDirectory(path)
     for image_path in image_paths:
@@ -135,20 +132,24 @@ def negatives():
 def Rototion_and_fliping_and_lable_making():
     kintamasis1 = input("Enter --Class-- name for augmntation: ")
     kintamasis2 = input("Enter is this gona be --Test-- or --Train-- data:")
-    path_to_photo = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\DAGM_KaggleUpload\{}".format(kintamasis1) + '\{}'.format(kintamasis2) + '//'
-    path_to_labels = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\DAGM_KaggleUpload\{}".format(kintamasis1) + '\{}'.format(kintamasis2) + '\Label/'
+    path_to_photo = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\DAGM_KaggleUpload\{}".format(
+        kintamasis1) + '\{}'.format(kintamasis2) + '//'
+    path_to_labels = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\DAGM_KaggleUpload\{}".format(
+        kintamasis1) + '\{}'.format(kintamasis2) + '\Label/'
     #####################
     linkas = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(kintamasis1) + '//'
     CreateDirectory(linkas)
     ####################
-    output_image_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(kintamasis1) + '\{}'.format(kintamasis2) + '/'
+    output_image_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(
+        kintamasis1) + '\{}'.format(kintamasis2) + '/'
     CreateDirectory(output_image_dir)
-    output_labels_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(kintamasis1) + '\{}'.format(kintamasis2) + '\Label/'
+    output_labels_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(
+        kintamasis1) + '\{}'.format(kintamasis2) + '\Label/'
     CreateDirectory(output_labels_dir)
     labels_txt = path_to_labels + 'Labels.txt'
     # collect all image from directory
     image_paths = GatherImagesFromDirectory(path_to_photo)
-    file_name = 27600  ######################################################### reikia pakeisti kai irasoma nauja Class paskutiniu image NR.
+    file_name = 27600  # #reikia pakeisti kai irasoma nauja Class paskutiniu image NR.
     for image_path in image_paths:
         file_name1 = GetFileName(image_path)  # gaunamas imago pavadinimas
         ar_defektuotas = Check_what_kind_of_label(labels_txt, file_name1)
@@ -211,7 +212,6 @@ def Rototion_and_fliping_and_lable_making():
             cv2.imwrite(output_labels_dir + str(file_name) + '.png', label7)
 
         if ar_defektuotas == 1:
-
             image_d = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
             file_name = int(file_name) + 1
             cv2.imwrite(output_image_dir + str(file_name) + '.png', image_d)
