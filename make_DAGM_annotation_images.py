@@ -58,32 +58,32 @@ def GetLabel(labels_txt_path, image_name):
     return 0.0, 0.0, 0.0, 0.0, 0.0
 
 
-def Check_what_kind_of_label(labels_txt_path, image_name):
-    labels_txt = open(labels_txt_path, "r")
-    lines = labels_txt.readlines()
-    for line in lines:
-        words = line.split()
-        name = words[0]
-        if image_name == name:
-            if int(words[1]) == 1:
-                defektuotas = 1
-                labels_txt.close()
-                return defektuotas
-            if int(words[1]) == 0:
-                nedefektuotas = 0
-                labels_txt.close()
-                return nedefektuotas
+def Check_what_kind_of_label(labels_txt_path, image_name):  # ivedama txt failo direktorija ir einamos image pavadinimas
+    labels_txt = open(labels_txt_path, "r")                 # atidaromas txt failas
+    lines = labels_txt.readlines()                          # nuskaitomos failo eilutes
+    for line in lines:                                      # iteruojama per eilutes
+        words = line.split()                                # eilute splitinama i zodzius
+        name = words[0]                                     # name = prilyginamas pirmam eilutes zodziui
+        if image_name == name:                              #
+            if int(words[1]) == 1:                          # jei eilutes 2 zodis == 1  --True--
+                defektuotas = 1                             # priskiriamas atskirimo zodis
+                labels_txt.close()                          # uzdaromas txt failas
+                return defektuotas                          # funkcija grazina atsakyma
+            if int(words[1]) == 0:                          # jei eilutes 2 zodis == 0
+                nedefektuotas = 0                           # priskiriamas atskirimo zodis 0   --False--
+                labels_txt.close()                          # uzdaromas txt failas
+                return nedefektuotas                        # funkcija grazina atsakyma
 
 
-def Getting_right_file(path, image_name):
-    image_paths = GatherImagesFromDirectory(path)
-    for image_path in image_paths:
-        file_name = GetFileName(image_path)
-        if file_name[0:4] == image_name:
-            file = image_path
-            return file
-        else:
-            continue
+def Getting_right_file(path, image_name):           # ivedama lable direktorija  ir nurodomas failo pavadinimas
+    image_paths = GatherImagesFromDirectory(path)   # nurenkami failai is nurodytos direktorijos
+    for image_path in image_paths:                  # iteruojama per surinktus failus
+        file_name = GetFileName(image_path)         # gaunamas iteruojamo failo pavadinimas
+        if file_name[0:4] == image_name:            # jei pirmos 4 pavadinimo rades sutampa su nurodutu failu
+            file = image_path                       # file = priskiriama rastas sutampantis failas
+            return file                             # funkcija grazina atsakyma
+        else:                                       # visais kitais atvejais
+            continue                                # grizti i for cikla ir testi darba
 
 
 def positives():
@@ -130,37 +130,51 @@ def negatives():
 
 
 def Rototion_and_fliping_and_lable_making():
+    ###################### is imputu gaunami kintamieji
     kintamasis1 = input("Enter --Class-- name for augmntation: ")
-    kintamasis2 = input("Enter is this gona be --Test-- or --Train-- data:")
+    kintamasis2 = input("Enter is this gona be --1--Test-- or --2--Train-- data:")
+
+    ###################### nurodomas kelias iki senu --images--
     path_to_photo = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\DAGM_KaggleUpload\{}".format(
         kintamasis1) + '\{}'.format(kintamasis2) + '//'
+
+    ###################### nurodomas kelias iki senu --lable--
     path_to_labels = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\DAGM_KaggleUpload\{}".format(
         kintamasis1) + '\{}'.format(kintamasis2) + '\Label/'
-    #####################
+
+    ######################  Sukurimas Class folderio naujoje bazeje
     linkas = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(kintamasis1) + '//'
     CreateDirectory(linkas)
-    ####################
+
+    ###################### cia dedami sugeneruoti nauji --images--
     output_image_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(
         kintamasis1) + '\{}'.format(kintamasis2) + '/'
     CreateDirectory(output_image_dir)
+
+    ###################### cia dedami sugeneruoti nauji --lable--
     output_labels_dir = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(
         kintamasis1) + '\{}'.format(kintamasis2) + '\Label/'
     CreateDirectory(output_labels_dir)
-    labels_txt = path_to_labels + 'Labels.txt'
-    # collect all image from directory
-    image_paths = GatherImagesFromDirectory(path_to_photo)
-    file_name = 27600  # #reikia pakeisti kai irasoma nauja Class paskutiniu image NR.
-    for image_path in image_paths:
-        file_name1 = GetFileName(image_path)  # gaunamas imago pavadinimas
-        ar_defektuotas = Check_what_kind_of_label(labels_txt, file_name1)
 
-        if ar_defektuotas == 0:
-            image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', image)
-            height, width = image.shape[:2]
-            label = np.zeros((height, width), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label)
+    ###################### nurodomas txt failiuko tikslus paemimo adresas
+    labels_txt = path_to_labels + 'Labels.txt'
+
+    ###################### collect all image from directory
+    image_paths = GatherImagesFromDirectory(path_to_photo)
+    ###################### reikia pakeisti kai irasoma nauja Class paskutiniu image NR.
+    file_name = 27600
+
+    for image_path in image_paths:
+        file_name1 = GetFileName(image_path)  # gaunamas iteruojamo imago pavadinimas
+        ar_defektuotas = Check_what_kind_of_label(labels_txt, file_name1)  # patikrinama ar image yra su defektu
+
+        if ar_defektuotas == 0:  # jeigu einama image yra be defekto
+            image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)             # nuskaitoma einama grayscale image
+            file_name = int(file_name) + 1                                   # Failu pavadinimu skaiciuokle ++
+            cv2.imwrite(output_image_dir + str(file_name) + '.png', image)   # irasomas image
+            height, width = image.shape[:2]                                  # gaunamos image dimensijos
+            label = np.zeros((height, width), np.uint8)                      # sukuriamas lable pagal gautas dimensijas
+            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label)  # irasomas lable
 
             new_img1 = cv2.rotate(image, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
             file_name = int(file_name) + 1
@@ -211,12 +225,12 @@ def Rototion_and_fliping_and_lable_making():
             label7 = np.zeros((height7, width7), np.uint8)
             cv2.imwrite(output_labels_dir + str(file_name) + '.png', label7)
 
-        if ar_defektuotas == 1:
-            image_d = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', image_d)
-            label_d = cv2.imread(Getting_right_file(path_to_labels, file_name1))
-            cv2.imwrite(output_labels_dir + str(file_name) + '_label.png', label_d)
+        if ar_defektuotas == 1:  # jeigu einama image yra su defektu
+            image_d = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)                   # nuskaitoma einama grayscale image
+            file_name = int(file_name) + 1                                           # Failu pavadinimu skaiciuokle ++
+            cv2.imwrite(output_image_dir + str(file_name) + '.png', image_d)         # irasomas image
+            label_d = cv2.imread(Getting_right_file(path_to_labels, file_name1))     # lable = randamas reikiamas failas
+            cv2.imwrite(output_labels_dir + str(file_name) + '_label.png', label_d)  # irasomas lable
 
             new_img1_d = cv2.rotate(image_d, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
             file_name = int(file_name) + 1
