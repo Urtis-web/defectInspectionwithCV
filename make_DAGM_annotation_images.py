@@ -162,7 +162,7 @@ def Rototion_and_fliping_and_lable_making():
     ###################### collect all image from directory
     image_paths = GatherImagesFromDirectory(path_to_photo)
     ###################### reikia pakeisti kai irasoma nauja Class paskutiniu image NR.
-    file_name = 119600
+    file_name = 128800
 
     for image_path in image_paths:
         file_name1 = GetFileName(image_path)  # gaunamas iteruojamo imago pavadinimas
