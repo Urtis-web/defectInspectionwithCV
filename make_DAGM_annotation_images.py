@@ -159,38 +159,44 @@ def Koeficientu_skaiciavimas():
 
     ground_truth_images = GatherImagesFromDirectory(ground_truth_path)
     prediction_images = GatherImagesFromDirectory(prediction_path)
-
+    fleg = 0
+    fleg2 = 0
     for ground_truth_image in ground_truth_images:
+        name_of_ground_truth_file = GetFileName(ground_truth_image)
         for prediction_image in prediction_images:
-            image = cv2.imread(ground_truth_image, cv2.IMREAD_GRAYSCALE)
-            image2 = cv2.imread(prediction_image, cv2.IMREAD_GRAYSCALE)
+            name_of_prediction_file = GetFileName(prediction_image)
+            if name_of_ground_truth_file == name_of_prediction_file:
 
-            tp, fp, tn, fn = Statistics.GetParameters(image, image2)
-            ####################### recall ##################################
-            recall = Statistics.GetRecall(tp, fn)
-            skaiciuokle_recall_vertes = float(skaiciuokle_recall_vertes) + float(recall)
-            skaiciuokle_recall_kartu = int(skaiciuokle_recall_kartu) + 1
-            ####################### precision ##################################
-            precision = Statistics.GetPrecision(tp, fp)
-            skaiciuokle_precision_vertes = float(skaiciuokle_precision_vertes) + float(precision)
-            skaiciuokle_precision_kartu = int(skaiciuokle_precision_kartu) + 1
-            ####################### accuracy ##################################
-            accuracy = Statistics.GetAccuracy(tp, fp, tn, fn)
-            skaiciuokle_accuracy_vertes = float(skaiciuokle_accuracy_vertes) + float(accuracy)
-            skaiciuokle_accuracy_kartu = int(skaiciuokle_accuracy_kartu) + 1
-            ####################### f1score ##################################
-            f1_score = Statistics.GetF1Score(recall, precision)
-            skaiciuokle_f1_score_vertes = float(skaiciuokle_f1_score_vertes) + float(f1_score)
-            skaiciuokle_f1_score_kartu = int(skaiciuokle_f1_score_kartu) + 1
-            ####################### IoU ##################################
-            IoU = Statistics.GetIoU(image, image2)
-            skaiciuokle_IoU_vertes = float(skaiciuokle_IoU_vertes) + float(IoU)
-            skaiciuokle_IoU_kartu = int(skaiciuokle_IoU_kartu) + 1
-            ####################### Dice_koef ##################################
-            Dice_koef = Statistics.GetDiceCoef(image, image2)
-            skaiciuokle_Dice_koef_vertes = float(skaiciuokle_Dice_koef_vertes) + float(Dice_koef)
-            skaiciuokle_Dice_koef_kartu = int(skaiciuokle_Dice_koef_kartu) + 1
+                image = cv2.imread(ground_truth_image, cv2.IMREAD_GRAYSCALE)
+                image2 = cv2.imread(prediction_image, cv2.IMREAD_GRAYSCALE)
 
+                tp, fp, tn, fn = Statistics.GetParameters(image, image2)
+                ####################### recall ##################################
+                recall = Statistics.GetRecall(tp, fn)
+                skaiciuokle_recall_vertes = float(skaiciuokle_recall_vertes) + float(recall)
+                skaiciuokle_recall_kartu = int(skaiciuokle_recall_kartu) + 1
+                ####################### precision ##################################
+                precision = Statistics.GetPrecision(tp, fp)
+                skaiciuokle_precision_vertes = float(skaiciuokle_precision_vertes) + float(precision)
+                skaiciuokle_precision_kartu = int(skaiciuokle_precision_kartu) + 1
+                ####################### accuracy ##################################
+                accuracy = Statistics.GetAccuracy(tp, fp, tn, fn)
+                skaiciuokle_accuracy_vertes = float(skaiciuokle_accuracy_vertes) + float(accuracy)
+                skaiciuokle_accuracy_kartu = int(skaiciuokle_accuracy_kartu) + 1
+                ####################### f1score ##################################
+                f1_score = Statistics.GetF1Score(recall, precision)
+                skaiciuokle_f1_score_vertes = float(skaiciuokle_f1_score_vertes) + float(f1_score)
+                skaiciuokle_f1_score_kartu = int(skaiciuokle_f1_score_kartu) + 1
+                ####################### IoU ##################################
+                IoU = Statistics.GetIoU(image, image2)
+                skaiciuokle_IoU_vertes = float(skaiciuokle_IoU_vertes) + float(IoU)
+                skaiciuokle_IoU_kartu = int(skaiciuokle_IoU_kartu) + 1
+                ####################### Dice_koef ##################################
+                Dice_koef = Statistics.GetDiceCoef(image, image2)
+                skaiciuokle_Dice_koef_vertes = float(skaiciuokle_Dice_koef_vertes) + float(Dice_koef)
+                skaiciuokle_Dice_koef_kartu = int(skaiciuokle_Dice_koef_kartu) + 1
+            else:
+                continue
     recall_final = skaiciuokle_recall_vertes / skaiciuokle_recall_kartu
     print("final recall value is: ", recall_final)
     print("\n")
