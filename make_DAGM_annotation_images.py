@@ -3,6 +3,7 @@ import glob
 import cv2
 import numpy as np
 import math
+from Tikslumo_koef_skaiciavimas import Statistics
 
 
 # self-explanatory method
@@ -12,19 +13,26 @@ def GatherImagesFromDirectory(directory):
     # define supproted types
     types = ['*.png', '*.bmp', '*.jpg']
     # define image list
-    imageList = []
+    image_list = []
     # check if directory exist
     if not os.path.exists(directory):
         print('Directory doesn\'t exist, return empty image path array')
-        return imageList  # exit method here
+        return image_list  # exit method here
     # gather images by types
     for type in types:
         specific_type_images = glob.glob(directory + type)
         # add one type images list to main array
-        imageList.extend(specific_type_images)
-    imageList.sort()
-    return imageList
+        image_list.extend(specific_type_images)
+    image_list.sort()
+    return image_list
 
+def gather_image_from_dir(input_dir):
+    image_extensions = ['*.bmp', '*.jpg', '*.png']
+    image_list = []
+    for image_extension in image_extensions:
+        image_list.extend(glob.glob(input_dir + image_extension))
+    image_list.sort()
+    return image_list
 
 def GetFileName(path):
     name_with_extension = os.path.basename(path)
@@ -128,6 +136,83 @@ def negatives():
         cv2.imwrite(negative_labels_output_dir + file_name + '.png', label)
         cv2.waitKey(1)
 
+def Koeficientu_skaiciavimas():
+    class_number = input("Enter --Class-- name for prediction files: ")
+    ground_truth_path = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(
+        class_number) + "\Test\Label//"
+
+    prediction_path = r"C:\Users\Urtis\Desktop\Straipsniai\dagm\Nauja\Sugeneruota_baze\{}".format(
+        class_number) + "\Predict1//"
+
+    skaiciuokle_recall_vertes = 0
+    skaiciuokle_recall_kartu = 0
+    skaiciuokle_precision_vertes = 0
+    skaiciuokle_precision_kartu = 0
+    skaiciuokle_accuracy_vertes = 0
+    skaiciuokle_accuracy_kartu = 0
+    skaiciuokle_f1_score_vertes = 0
+    skaiciuokle_f1_score_kartu = 0
+    skaiciuokle_IoU_vertes = 0
+    skaiciuokle_IoU_kartu = 0
+    skaiciuokle_Dice_koef_vertes = 0
+    skaiciuokle_Dice_koef_kartu = 0
+
+    ground_truth_images = GatherImagesFromDirectory(ground_truth_path)
+    prediction_images = GatherImagesFromDirectory(prediction_path)
+
+    for ground_truth_image in ground_truth_images:
+        for prediction_image in prediction_images:
+            image = cv2.imread(ground_truth_image, cv2.IMREAD_GRAYSCALE)
+            image2 = cv2.imread(prediction_image, cv2.IMREAD_GRAYSCALE)
+
+            tp, fp, tn, fn = Statistics.GetParameters(image, image2)
+            ####################### recall ##################################
+            recall = Statistics.GetRecall(tp, fn)
+            skaiciuokle_recall_vertes = float(skaiciuokle_recall_vertes) + float(recall)
+            skaiciuokle_recall_kartu = int(skaiciuokle_recall_kartu) + 1
+            ####################### precision ##################################
+            precision = Statistics.GetPrecision(tp, fp)
+            skaiciuokle_precision_vertes = float(skaiciuokle_precision_vertes) + float(precision)
+            skaiciuokle_precision_kartu = int(skaiciuokle_precision_kartu) + 1
+            ####################### accuracy ##################################
+            accuracy = Statistics.GetAccuracy(tp, fp, tn, fn)
+            skaiciuokle_accuracy_vertes = float(skaiciuokle_accuracy_vertes) + float(accuracy)
+            skaiciuokle_accuracy_kartu = int(skaiciuokle_accuracy_kartu) + 1
+            ####################### f1score ##################################
+            f1_score = Statistics.GetF1Score(recall, precision)
+            skaiciuokle_f1_score_vertes = float(skaiciuokle_f1_score_vertes) + float(f1_score)
+            skaiciuokle_f1_score_kartu = int(skaiciuokle_f1_score_kartu) + 1
+            ####################### IoU ##################################
+            IoU = Statistics.GetIoU(image, image2)
+            skaiciuokle_IoU_vertes = float(skaiciuokle_IoU_vertes) + float(IoU)
+            skaiciuokle_IoU_kartu = int(skaiciuokle_IoU_kartu) + 1
+            ####################### Dice_koef ##################################
+            Dice_koef = Statistics.GetDiceCoef(image, image2)
+            skaiciuokle_Dice_koef_vertes = float(skaiciuokle_Dice_koef_vertes) + float(Dice_koef)
+            skaiciuokle_Dice_koef_kartu = int(skaiciuokle_Dice_koef_kartu) + 1
+
+    recall_final = skaiciuokle_recall_vertes / skaiciuokle_recall_kartu
+    print("final recall value is: ", recall_final)
+    print("\n")
+
+    precision_final = skaiciuokle_precision_vertes / skaiciuokle_precision_kartu
+    print("final precision value is: ", precision_final)
+    print("\n")
+
+    accuracy_final = skaiciuokle_accuracy_vertes / skaiciuokle_accuracy_kartu
+    print("final accuracy value is: ", accuracy_final)
+    print("\n")
+
+    f1_score_final = skaiciuokle_f1_score_vertes / skaiciuokle_f1_score_kartu
+    print("final f1_score value is: ", f1_score_final)
+    print("\n")
+
+    IoU_final = skaiciuokle_IoU_vertes / skaiciuokle_IoU_kartu
+    print("final IoU value is: ", IoU_final)
+    print("\n")
+
+    Dice_koef_final = skaiciuokle_Dice_koef_vertes / skaiciuokle_Dice_koef_kartu
+    print("final Dice_koef value is: ", Dice_koef_final)
 
 def Rototion_and_fliping_and_lable_making():
     ###################### is imputu gaunami kintamieji
@@ -162,7 +247,7 @@ def Rototion_and_fliping_and_lable_making():
     ###################### collect all image from directory
     image_paths = GatherImagesFromDirectory(path_to_photo)
     ###################### reikia pakeisti kai irasoma nauja Class paskutiniu image NR.
-    file_name = 128800
+    file_name = 9865
 
     for image_path in image_paths:
         file_name1 = GetFileName(image_path)  # gaunamas iteruojamo imago pavadinimas
@@ -171,64 +256,64 @@ def Rototion_and_fliping_and_lable_making():
         if ar_defektuotas == 0:  # jeigu einama image yra be defekto
             image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)             # nuskaitoma einama grayscale image
             file_name = int(file_name) + 1                                   # Failu pavadinimu skaiciuokle ++
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', image)   # irasomas image
+            cv2.imwrite(output_image_dir + str(file_name) + '.png', image)   # irasoma image
             height, width = image.shape[:2]                                  # gaunamos image dimensijos
             label = np.zeros((height, width), np.uint8)                      # sukuriamas lable pagal gautas dimensijas
             cv2.imwrite(output_labels_dir + str(file_name) + '.png', label)  # irasomas lable
-
-            new_img1 = cv2.rotate(image, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img1)
-            height1, width1 = new_img1.shape[:2]
-            label1 = np.zeros((height1, width1), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label1)
-
-            new_img2 = cv2.rotate(image, rotateCode=1)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img2)
-            height2, width2 = new_img2.shape[:2]
-            label2 = np.zeros((height2, width2), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label2)
-
-            new_img3 = cv2.rotate(image, rotateCode=2)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img3)
-            height3, width3 = new_img3.shape[:2]
-            label3 = np.zeros((height3, width3), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label3)
-
-            new_fliped_img4 = cv2.flip(image, 1)
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_fliped_img4)
-            height4, width4 = new_fliped_img4.shape[:2]
-            label4 = np.zeros((height4, width4), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label4)
-
-            new_img5 = cv2.rotate(new_fliped_img4, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img5)
-            height5, width5 = new_img5.shape[:2]
-            label5 = np.zeros((height5, width5), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label5)
-
-            new_img6 = cv2.rotate(new_fliped_img4, rotateCode=1)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img6)
-            height6, width6 = new_img6.shape[:2]
-            label6 = np.zeros((height6, width6), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label6)
-
-            new_img7 = cv2.rotate(new_fliped_img4, rotateCode=2)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
-            file_name = int(file_name) + 1
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img7)
-            height7, width7 = new_img7.shape[:2]
-            label7 = np.zeros((height7, width7), np.uint8)
-            cv2.imwrite(output_labels_dir + str(file_name) + '.png', label7)
+            #
+            # new_img1 = cv2.rotate(image, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img1)
+            # height1, width1 = new_img1.shape[:2]
+            # label1 = np.zeros((height1, width1), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label1)
+            #
+            # new_img2 = cv2.rotate(image, rotateCode=1)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img2)
+            # height2, width2 = new_img2.shape[:2]
+            # label2 = np.zeros((height2, width2), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label2)
+            #
+            # new_img3 = cv2.rotate(image, rotateCode=2)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img3)
+            # height3, width3 = new_img3.shape[:2]
+            # label3 = np.zeros((height3, width3), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label3)
+            #
+            # new_fliped_img4 = cv2.flip(image, 1)
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_fliped_img4)
+            # height4, width4 = new_fliped_img4.shape[:2]
+            # label4 = np.zeros((height4, width4), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label4)
+            #
+            # new_img5 = cv2.rotate(new_fliped_img4, rotateCode=0)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img5)
+            # height5, width5 = new_img5.shape[:2]
+            # label5 = np.zeros((height5, width5), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label5)
+            #
+            # new_img6 = cv2.rotate(new_fliped_img4, rotateCode=1)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img6)
+            # height6, width6 = new_img6.shape[:2]
+            # label6 = np.zeros((height6, width6), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label6)
+            #
+            # new_img7 = cv2.rotate(new_fliped_img4, rotateCode=2)  # 0 = 90 degrees; 1 = 180 degrees; 2 = 270 degrees
+            # file_name = int(file_name) + 1
+            # cv2.imwrite(output_image_dir + str(file_name) + '.png', new_img7)
+            # height7, width7 = new_img7.shape[:2]
+            # label7 = np.zeros((height7, width7), np.uint8)
+            # cv2.imwrite(output_labels_dir + str(file_name) + '.png', label7)
 
         if ar_defektuotas == 1:  # jeigu einama image yra su defektu
             image_d = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)                   # nuskaitoma einama grayscale image
             file_name = int(file_name) + 1                                           # Failu pavadinimu skaiciuokle ++
-            cv2.imwrite(output_image_dir + str(file_name) + '.png', image_d)         # irasomas image
+            cv2.imwrite(output_image_dir + str(file_name) + '.png', image_d)         # irasoma image
             label_d = cv2.imread(Getting_right_file(path_to_labels, file_name1))     # lable = randamas reikiamas failas
             cv2.imwrite(output_labels_dir + str(file_name) + '_label.png', label_d)  # irasomas lable
 
@@ -276,7 +361,7 @@ def Rototion_and_fliping_and_lable_making():
 
 
 def main():
-    Rototion_and_fliping_and_lable_making()
+    Koeficientu_skaiciavimas()
 
 
 # what we will start? (entry point)
