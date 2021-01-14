@@ -22,8 +22,6 @@ class Statistics:
         tn = imageHeight * imageWidth - tp - fp - fn
         return tp, fp, tn, fn
 
-
-
     @staticmethod
     def GetRecall(tp, fn):
         divider = tp + fn
@@ -35,8 +33,6 @@ class Statistics:
         recall = round(recall, 4)
         return recall
 
-
-
     @staticmethod
     def GetPrecision(tp, fp):
         divider = tp + fp
@@ -46,9 +42,7 @@ class Statistics:
         else:
             precision = tp / (tp + fp)
         precision = round(precision, 4)
-    return precision
-
-
+        return precision
 
     @staticmethod
     def GetAccuracy(tp, fp, tn, fn):
@@ -57,11 +51,9 @@ class Statistics:
         if divider == 0.0:
             accuracy = 1.0
         else:
-        accuracy = (tp + tn) / (tp + tn + fp + fn)
+            accuracy = (tp + tn) / (tp + tn + fp + fn)
         accuracy = round(accuracy, 4)
         return accuracy
-
-
 
     @staticmethod
     def GetF1Score(recall, precision):
@@ -74,15 +66,12 @@ class Statistics:
         f1 = round(f1, 4)
         return f1
 
-
-
     @staticmethod
     def GetIoU(groundTruth, prediction):
         imageHeight, imageWidth = groundTruth.shape
 
         intersection = np.zeros((imageHeight, imageWidth, 1), np.uint8)
         cv2.bitwise_and(groundTruth, prediction, intersection)
-
 
         union = np.zeros((imageHeight, imageWidth, 1), np.uint8)
         cv2.bitwise_or(groundTruth, prediction, union)
@@ -97,11 +86,9 @@ class Statistics:
         iou = round(iou, 4)
         return iou
 
-
     @staticmethod
     def GetDiceCoef(groundTruth, prediction):
         smooth = 1e-6
-
 
         imageHeight, imageWidth = groundTruth.shape
 

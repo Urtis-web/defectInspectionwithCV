@@ -168,8 +168,10 @@ def Koeficientu_skaiciavimas():
             if name_of_ground_truth_file == name_of_prediction_file:
 
                 image = cv2.imread(ground_truth_image, cv2.IMREAD_GRAYSCALE)
+                cv2.imshow('ground truth image', image)
                 image2 = cv2.imread(prediction_image, cv2.IMREAD_GRAYSCALE)
-
+                cv2.imshow('prediction image', image2)
+                cv2.waitKey(2000)
                 tp, fp, tn, fn = Statistics.GetParameters(image, image2)
                 ####################### recall ##################################
                 recall = Statistics.GetRecall(tp, fn)
